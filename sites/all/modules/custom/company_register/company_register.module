@@ -1,0 +1,66 @@
+<?php
+
+require_once 'inc/company_register_db.inc'; // Bases de données
+require_once 'inc/company_register_langs.inc'; // Langues
+require_once 'inc/company_register_validate.inc'; // Validate
+require_once 'inc/company_register_submit.inc'; // Submit
+
+function _company_register_access_callback() {
+  return user_access('SAI_COM_ENT');
+}
+
+ /**
+ * Implements hook_menu().
+ *
+ * Cette fonction rajoute un menu d'accès pour la création de compte des entreprises.
+ * Return: Drupal menu items
+ */
+function company_register_menu() {
+  $items = array();
+
+  // FORMULAIRE CREATION ENTREPRISE
+  $items['nouvelle/entreprise'] = array(
+      'title' => t('Création de compte entreprise'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('company_register_information_form'),
+      'access arguments' => array('SAI_COM_ENT'),//'_company_register_access_callback',
+      'file' => 'inc/company_register_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+  $items['nouvelle/entreprise/charte'] = array(
+      'title' => t('Charte'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('company_register_charte'),
+      'access arguments' => array('SAI_COM_ENT'),
+      'file' => 'inc/company_register_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+//   $items['nouvelle/entreprise/confirmation'] = array(
+//     'title' => t('Confirmation de vos informations'),
+//     'page callback' => 'drupal_get_form',
+//     'page arguments' => array('company_register_page_confirmation'),
+//     'access arguments' => array('SAI_COM_ENT'),
+//     'file' => '/inc/company_register_form_confirm.inc',
+//     'type' => MENU_CALLBACK,
+//   );
+//   $items['nouvelle/entreprise/sauvegarde'] = array(
+//     'title' => t('Sauvegarde des informations'),
+//     'page callback' => 'drupal_get_form',
+//     'page arguments' => array('company_register_page_insert_data'),
+//     'access arguments' => array('SAI_COM_ENT'),
+//     'file' => '/inc/company_register_form_confirm.inc',
+//     'type' => MENU_CALLBACK,
+//   );
+
+  // AUTOCOMPLETION SIRET
+  $items['autocomplete/siret'] = array(
+    'page callback' => 'company_siret_autocomplete',
+    'access callback' => TRUE,
+    'file' => 'inc/company_register_db.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  // Retourne le menu
+  return $items;
+}
+

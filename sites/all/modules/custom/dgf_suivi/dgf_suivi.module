@@ -1,0 +1,43 @@
+<?php
+
+function _dgf_suivi_demande_access_callback() {
+  return user_access('SUI_DGF_CP') || user_access('SUI_DGF_TA');
+}
+
+function _dgf_suivi_paiement_access_callback() {
+  return user_access('SUI_PAI_CP') || user_access('SUI_PAI_TA');
+}
+
+/**
+ * Implements hook_menu().
+ */
+function dgf_suivi_menu() {
+
+  $items = array();
+
+  $items['dgf/suivi/demande'] = array(
+      'title' => t('Suivi des demandes de gestion et financement'),
+      'type' => MENU_CALLBACK,
+      'page callback' => 'dgf_suivi_demande_init_page',
+      'access callback' => '_dgf_suivi_demande_access_callback',
+      'file' => 'inc/demande/demande_table.inc',
+  );
+
+  $items['dgf/suivi/demande/pager'] = array(
+      'title' => t('Suivi des demandes de gestion et financement'),
+      'page callback' => 'dgf_suivi_demande_data',
+      'access callback' => '_dgf_suivi_demande_access_callback',
+      'file' => 'inc/demande/demande_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+ $items['dgf/suivi/paiement'] = array(
+      'title' => t('Suivi des paiements'),
+      'page callback' => 'dgf_suivi_paiement_data',
+      'access callback' => '_dgf_suivi_paiement_access_callback',
+      'file' => 'inc/paiement/paiement_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}

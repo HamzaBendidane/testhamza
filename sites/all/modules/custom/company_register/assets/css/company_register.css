@@ -1,0 +1,225 @@
+div.password-confirm {
+  float: none;
+  margin-top: 0;
+  visibility: hidden;
+  width: auto;
+  position: absolute;
+  top: 5px;
+  left: 470px;
+}
+
+div.password-strength {
+  margin-top: 0;
+}
+#company-register-information-form #confirmation label{
+	width: auto;
+}
+.res_label{
+	font:bold 16px open-sans;
+	padding-right: 15px;
+}
+
+.sm-margin-top{
+	margin-top: 30px;
+}
+.charte-btn{
+  color: #D54015;
+  padding: 3px;
+  border-radius: 5px;
+  border: 1px solid #ABC7D5;
+  text-transform: uppercase;	
+  background: #fff;
+  font: 15px Arial, Helvetica, sans-serif;
+  line-height: 1.0em;
+  margin: 0 20px;
+  vertical-align: middle;
+  height: 25px;
+}
+
+a.charte-btn{
+	text-decoration: none;
+	font: 15px Arial, Helvetica, sans-serif;
+	line-height: 1.0em;
+	cursor: pointer
+}
+
+.infos{
+  color: #d54015;
+  font: 15px open sans-serif;
+  font-weight: 600;
+}
+
+
+
+/** ______________ CSS FOR AUTOCOMPLETE __________________________________________________**/
+.autocomplete-suggestions { border: 1px solid #999; background: #FFF; overflow: auto; }
+.autocomplete-suggestion { padding: 2px 5px; white-space: nowrap; overflow: hidden; }
+.autocomplete-selected { background: #F0F0F0; }
+.autocomplete-suggestions strong { font-weight: normal; color: #3399FF; }
+.autocomplete-group { padding: 2px 5px; }
+.autocomplete-group strong { display: block; border-bottom: 1px solid #000; }
+
+
+/* -------------------- ETAPES --------------------------------------- */
+
+
+
+/* -------------------- CHARTE --------------------------------------- */
+#charte{
+  margin: auto;
+  height: 280px;
+  overflow-y: auto;
+  border: 1px solid #b8c5cb;
+  padding: 15px;
+  border-radius: 5px;
+  font: 12px 'Open Sans', sans-serif;  
+  font-weight: 600;
+  float: none;
+  text-align: center;
+}
+#charte p{
+  font: 12px 'Open Sans', sans-serif;  
+}
+
+#boutonActionCharte {
+  text-align: center;
+  margin-top: 20px;
+}
+
+/* Scrollbar */
+#charte::-webkit-scrollbar-track
+{
+	-webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+	background-color: #F5F5F5;
+}
+
+#charte::-webkit-scrollbar
+{
+	width: 10px;
+	background-color: #F5F5F5;
+}
+
+#charte::-webkit-scrollbar-thumb
+{
+	background-color: #b8c5cb;
+	border: 2px solid #b8c5cb;
+}
+/* --------------- END SCROLLBAR ---------- */
+
+
+/* --------------- FIELDS --------------- */
+.fieldset-legend {
+  color: #0095B7;
+}
+
+div.fieldset-wrapper input.form-text, div.right-col input, div.left-col input, div.form-item-company-adresse-street-name-more input, div.form-item-company-telephone  input {
+  width: 273px;
+}
+
+div.form-item-company-adresse-street-name input.form-text, div.form-item-company-adresse-town input.form-text{
+  width: 208px;
+}
+
+div.form-item-company-adresse-town label{
+  display: none;
+}
+
+div.form-item-company-adresse-street-name-more, div.form-item-company-telephone {
+  float: right;
+  width: 100%;
+  padding-left: 50%;
+}
+
+div.company-infos {
+  display: inline-block;
+  border-bottom: solid 1px #abc7d5;
+}
+
+#edit-responsable, #edit-utilisateur, #edit-company{
+  background: #e9f1f6;
+}
+
+div.form-type-password {
+  position: relative;
+  margin-bottom: 16px;
+}
+
+div.password-strength {
+  position: absolute;
+  left: 470px;
+}
+
+div.form-item-company-adresse-street-number, div.form-item-company-code-postal {
+  width: 214px;
+}
+
+div.form-item-company-adresse-street-number input, div.form-item-company-code-postal input, div.form-item-num-rue input, div.form-item-zip-code input {
+  width: 50px !important;
+}
+
+div.form-item-company-adresse-street-name label, div.form-item-nom-rue label {
+  display: none;
+}
+
+div.form-item-nom-rue input.form-text, div.form-item-city input.form-text {
+  width: 295px;
+}
+
+div.form-item-company-adresse-street-name div.messages-inline, div.form-item-nom-rue div.messages-inline {
+  display: none;
+}
+
+/* PRINT DIV  CHARTE */
+@media print {
+	body * { visibility: hidden; }
+	#charte  * { visibility: visible; }
+    #charte{
+    	top: -190px;
+        font-size: 15px;
+        line-height: 18px;
+        text-align: left;
+        width: 100%;
+        height: 100%;
+		margin-top: -50px;
+		padding: 0;
+		border: 0;
+		float: none !important;
+		color: black;
+		background: transparent;
+    }
+    /* Impression de la partie confirmation */
+    #company-register-page-confirmation * { visibility: visible;}
+    #company-register-page-confirmation{ 
+        top: -190px;
+        font-size: 15px;
+        line-height: 18px;
+        text-align: left;
+        width: 100%;
+        height: 100%;
+		margin-top: -50px;
+		padding: 0;
+		border: 0;
+		float: none !important;
+		color: black;
+		background: transparent;	
+   }
+}
+
+#edit-refuse {
+  border-radius: 5px;
+  color: #e05a10!important;
+  background-color: #FFFFFF !important;
+  border-color: #ABC7D5!important;
+  font-weight: bold;
+  text-transform: uppercase;
+  float: left;
+}
+
+#edit-accepte {
+  color: #FFFFFF!important;
+  font-weight: bold;
+  text-transform: uppercase;
+  background-color: #e05a10!important;
+  border-color: #ABC7D5!important;
+  float: right;
+}

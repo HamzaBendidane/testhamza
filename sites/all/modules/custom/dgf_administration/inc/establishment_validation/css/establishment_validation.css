@@ -1,0 +1,23 @@
+.form-group {
+	width: 33%;
+	margin-right: 0px;
+}
+
+.form-type-textfield input{
+	width: 75%;
+}
+
+.listBtn {
+  border: 0px;
+  background-color: white;
+}
+
+.sticky-enabled a.action {
+  color: #000000;
+/*   margin-left: 20px; */
+}
+
+/* Cette partie est gérée avec jQuery car la page est chargé en js
+.table-container table {
+	min-width: 100%;
+} */

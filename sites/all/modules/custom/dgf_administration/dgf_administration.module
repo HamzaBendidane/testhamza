@@ -1,0 +1,251 @@
+<?php
+
+function _dgf_administration_mon_compte_callback() {
+  global $user;
+  return in_array('COLLABORATEUR ENTREPRISE', $user->roles);
+}
+
+/**
+ * Implements hook_menu().
+ *
+ * Cette fonction rajoute un menu d'accès pour la création de compte des entreprises.
+ * Return: Drupal menu items
+ */
+function dgf_administration_menu() {
+ $items = array();
+
+ // Compte Utilisateur
+ $items['espace/mon-compte'] = array(
+        'title' => 'Mon compte',
+        'page callback' => 'drupal_get_form',
+        'page arguments' => array('dgf_administration_user_account_form'),
+        'access callback' => '_dgf_administration_mon_compte_callback',
+        'file' => '/inc/Compte_utilisateurs/dgf_administration_user_account_form.inc',
+        'type' => MENU_NORMAL_ITEM,
+ );
+  // Service AJAX pour la Gestion  des utilisateurs
+  $items['user/management'] = array(
+    'page callback' => 'ajax_gestion_search',
+    'access callback' => TRUE,
+    'access arguments' => array('access content'), 
+    'file' => '/inc/Gestion_utilisateurs/dgf_administration_users_form.inc',
+    'type' => MENU_CALLBACK,
+  );
+  $items['user/management/all'] = array(
+    'page callback' => 'ajax_gestion_users',
+    'access callback' => TRUE,
+    'access arguments' => array('access content'),
+    'file' => '/inc/Gestion_utilisateurs/dgf_administration_users_form.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  // SI l'utilisateur à la permission alors on Affichele menu correspondant
+   _dgf_administration_gestions_utilisateurs_menu($items);
+   _dgf_management_establishment($items);
+   _dgf_validation_establishment($items);
+   _dgf_administration_gestions_utilisateurs_menu($items);
+   _dgf_administration_parametre_menu($items);
+
+  return $items;
+}
+
+/**
+ *  Menu Gestion des Etablissements
+ *
+ */
+function _dgf_management_establishment(&$items) {
+  // Liste les établissements à valider
+  $items['gestion/etablissement/list'] = array(
+      'title' => t('Gestion des établissements'),
+      'type' => MENU_NORMAL_ITEM,
+      'page callback' => 'opcaim_management_establishment_init_page',
+      'access arguments' => array('GES_LIS_ETA'),
+      'file' => 'inc/establishment_management_list/establishment_management_list_table.inc',
+  );
+
+  $items['gestion/etablissement/list/pager'] = array(
+      'title' => t('Gestion des établissements'),
+      'page callback' => 'opcaim_management_establishment_data',
+      'access arguments' => array('GES_LIS_ETA'),
+      'file' => 'inc/establishment_management_list/establishment_management_list_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['gestion/etablissement/list/autocomplete/siret'] = array(
+      'title' => 'Siret Entreprises',
+      'page callback' => 'establishments_management_siret_autocomplete',
+      'access callback' => TRUE,
+      'file' => 'inc/establishment_management_list/establishment_management_list_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['gestion/etablissement/list/autocomplete/corporate-name'] = array(
+      'title' => 'Raison sociale',
+      'page callback' => 'establishments_management_corporate_name_autocomplete',
+      'access callback' => TRUE,
+      'file' => 'inc/establishment_management_list/establishment_management_list_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['gestion/etablissement/list/autocomplete/responsible-name'] = array(
+      'title' => 'Numéro de déclaration d’activité',
+      'page callback' => 'establishments_management_responsible_name_autocomplete',
+      'access callback' => TRUE,
+      'file' => 'inc/establishment_management_list/establishment_management_list_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  // Appel ajax pour la supression d'un établissement
+  $items['ajax/gestion/management/etablissement/delete/%'] = array(
+      'title' => 'Numéro de déclaration d’activité',
+      'page callback' => 'get_stored_proc_delete_establishment',
+      'access arguments' => array('GES_SUP_ETA'),
+      'page argument' => array(5),
+      'file' => 'inc/establishment_management_list/establishment_management_list_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  // Modification de la création d'un établissement
+  $items['gestion/etablissement/edit'] = array(
+      'title' => t('Gestion de la création d\'un établissement'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('opcaim_establishment_management_form'),
+      'access arguments' => array('GES_MOD_ETA'),
+      'file' => 'inc/establishment_management/establishment_management_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+  return $items;
+}
+
+
+/**
+ *  Menu Validation des Etablissements
+ *
+ */
+function _dgf_validation_establishment(&$items) {
+  // ------------------------------------------------------------------ Liste les établissements à valider
+  $items['validation/etablissement/list'] = array(
+      'title' => t('Validation des créations/modifications des établissements'),
+      'type' => MENU_NORMAL_ITEM,
+      'page callback' => 'opcaim_validation_establishment_init_page',
+      'access arguments' => array('GES_VAL_UTI'),
+      'file' => 'inc/establishment_validation/establishment_validation_table.inc',
+  );
+
+  $items['validation/etablissement/list/pager'] = array(
+      'title' => t('Validation des créations/modifications des établissements'),
+      'page callback' => 'opcaim_validation_establishment_data',
+      'access arguments' => array('GES_VAL_UTI'),
+      'file' => 'inc/establishment_validation/establishment_validation_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  // ------------------------------------------------------------------ Modification d'un établissement à valider
+  $items['validation/etablissement/edit'] = array(
+      'title' => t('Validation de la créations/modifications d\'un établissement'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('opcaim_establishment_validation_edit_form'),
+      'access arguments' => array('GES_VAL_UTI'),
+      'file' => 'inc/establishment_validation_edit/establishment_validation_edit_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  // ------------------------------------------------------------------ Autocomplétion pour les filtres dans validation
+  $items['get/etablissement/autocomplete/siret'] = array(
+      //'title' => 'Siret Entreprises',
+      'page callback' => 'establishment_validation_siret_autocomplete',
+      'access callback' => TRUE,
+      'file' => 'inc/establishment_validation/establishment_validation_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['get/etablissement/autocomplete/corporate-name'] = array(
+      'title' => 'Raison sociale',
+      'page callback' => 'establishment_validation_corporate_name_autocomplete',
+      'access callback' => TRUE,
+      'file' => 'inc/establishment_validation/establishment_validation_table.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+//   $items['get/etablissement/autocomplete/responsible-name'] = array(
+//       'title' => 'Numéro de déclaration d’activité',
+//       'page callback' => 'establishment_validation_responsible_name_autocomplete',
+//       'access callback' => TRUE,
+//       'file' => 'inc/establishment_validation/establishment_validation_table.inc',
+//       'type' => MENU_CALLBACK,
+//   );
+  return $items;
+}
+
+/**
+ *  Menu Gestion des utilisateurs
+ *
+ */
+function _dgf_administration_gestions_utilisateurs_menu(&$items){
+
+  // Gestion des utilisateurs
+  $items['gestion/utilisateurs'] = array(
+    'title' => 'Gestion des utilisateurs',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dgf_administration_users_form'),
+    'access arguments' => array('GES_LIS_UTI'),
+    'file' => '/inc/Gestion_utilisateurs/dgf_administration_users_form.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+  // Validation des utilisateurs
+  $items['gestion/valider/utilisateur'] = array(
+     'title' => 'Validation des comptes utilisateurs',
+     'page callback' => 'drupal_get_form',
+     'page arguments' => array('dgf_administration_users_verify_form'),
+     'access arguments' => array('GES_VAL_UTI'),
+     'file' => '/inc/Validation_utilisateurs/dgf_administration_users_verify_form.inc',
+      'type' => MENU_CALLBACK,
+      );
+
+  // Création d'un utilisateur
+  $items['gestion/creer/utilisateur'] = array(
+    'title' => 'Créer un compte utilisateur',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dgf_administration_form'),
+    'access arguments' => array('GES_AJO_UTI'),
+    'file' => '/inc/Creation_utilisateur/dgf_administration_form.inc',
+    'type' => MENU_CALLBACK,
+   );
+
+  // Modification d'un utilisateur
+  $items['gestion/modifier/utilisateur'] = array(
+    'title' => 'Modifier un compte utilisateur',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dgf_administration_update_users_form'),
+    'access arguments' => array('GES_MOD_UTI'),
+    'file' => '/inc/Modification_utilisateur/dgf_administration_update_form.inc',
+    'type' => MENU_CALLBACK,
+   );
+   return $items;
+}
+
+/**
+ *  Menu Paramètres
+ *
+ */
+function _dgf_administration_parametre_menu(&$items) {
+  // Gestion des paramètres
+  $items['opcaim-admin/parametres'] = array(
+      'title' => 'Gestion des paramètres des demandes de gestion et financement',
+      'page callback' => 'parametres_init_page',
+      'access arguments' => array('GES_DGF_PAR'),
+      'file' => '/inc/parametres/parametres_view.inc',
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  // Gestion des paramètres
+  $items['opcaim-admin/parametres/pager'] = array(
+      'title' => 'Gestion des paramètres des demandes de gestion et financement',
+      'page callback' => 'parametres_data',
+      'access arguments' => array('GES_DGF_PAR'),
+      'file' => '/inc/parametres/parametres_view.inc',
+      'type' => MENU_CALLBACK
+  );
+
+  return $items;
+}

@@ -1,0 +1,43 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function dgf_contrat_pro_menu() {
+  $items = array();
+  $items['dgf/demande/contrat-pro/stagiaire'] = array(
+    'title' => t('Demande de gestion et financement - contrat pro - stagiaire' ),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('dgf_contrat_pro_stagiaire_form'),
+    'access arguments' => array('SAI_DGF_CP'),
+    'file' => 'inc/stagiaire/stagiaire_form.inc',
+    'type' => MENU_CALLBACK);
+
+  $items['dgf/demande/contrat-pro/tuteur'] = array(
+      'title' => t('Demande de gestion et financement - contrat pro - tuteur' ),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_contrat_pro_tuteur_form'),
+      'access arguments' => array('SAI_DGF_CP'),
+      'file' => 'inc/tuteur/tuteur_form.inc',
+      'type' => MENU_CALLBACK);
+
+  // test formulaire de la pop up message d'information finale
+  $items['dgf/demande/contrat-pro/cerfa'] = array(
+    'title' => t('CERFA' ),
+//     'page callback' => 'dgf_contrat_pro_cerfa_callback',
+  	'page callback' => 'drupal_get_form',
+    'page arguments' => array('dgf_contrat_pro_cerfa_form'),
+    'access arguments' => array('SAI_DGF_CP'),
+    'file' => 'inc/cerfa/cerfa_form.inc',
+    'type' => MENU_CALLBACK);
+
+  $items['autocomplete/get-salarie-from-name'] = array(
+    'title' => t('Liste des salariés correspondant au nom donné' ),
+    'page callback' => 'stagiaire_get_salarie_from_name',
+    'access callback' => TRUE,
+    'file' => 'inc/stagiaire/stagiaire_db.inc',
+    'type' => MENU_CALLBACK
+  );
+
+  return $items;
+}

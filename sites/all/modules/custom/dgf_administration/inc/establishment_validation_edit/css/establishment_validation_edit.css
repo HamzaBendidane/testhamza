@@ -1,0 +1,27 @@
+#edit-filter-center {
+	margin-bottom: 20px;
+}
+
+.sticky-enabled {
+	margin-left: 30px;
+}
+
+.description {
+ 	width: 100px; 
+	color: #d54015;
+}
+
+/* .description:before { */
+/* 	content:"\A"; */
+/* 	white-space:pre; */
+/* } */
+
+/* .form-item-title label:after { */
+/* 	content:"\A"; */
+/*   white-space:pre; */
+/* } */
+
+/* .edit-title:before {
+	content:"<br />";
+	white-space:pre;
+} */

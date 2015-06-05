@@ -1,0 +1,26 @@
+/* .add-button { */
+/* 	margin : 0px; */
+/* } */
+
+.option {
+	width: 690px;
+}
+
+.hiddenField {
+	visibility: hidden;
+	height: 0px;
+}
+
+.form-wrapper {
+  margin-top: 20px;
+}
+
+.modal label {
+  width: 120px;
+}
+
+.required label:after {
+    color: #e32;
+    content: ' *';
+    display:inline;
+}

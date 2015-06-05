@@ -1,0 +1,24 @@
+#coef_info {
+  float: left;
+  margin-right: 2px;
+}
+
+#group_info {
+  float: left;
+  margin-right: 2px;
+}
+
+#pay_info {
+  float: left;
+  margin-right: 2px;
+}
+
+.form-item-type-renewal > label {
+  width: 350px;
+}
+.left{
+	float : left;
+}
+.right{
+	float : left;
+}

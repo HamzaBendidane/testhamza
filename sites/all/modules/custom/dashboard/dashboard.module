@@ -1,0 +1,45 @@
+<?php
+
+function _dashboard_access_callback() {
+  global $user;
+  return $user->uid;
+}
+
+function dashboard_menu() {
+  $items = array();
+  $items['dashboard'] = array(
+      'title' => t('Dashboard'),
+      'page callback' => 'dashboard_view',
+      'access callback' => '_dashboard_access_callback',
+      'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+function dashboard_view() {
+  global $user;
+
+  $variables = array();
+
+  // TODO : distinguer les cas suivant le rôle du user connecté
+  $output = theme('dashboard_theme', $variables);
+
+  return $output;
+}
+
+/*
+ * Implementation of hook_theme().
+*/
+function dashboard_theme($existing, $type, $theme, $path) {
+  // TODO : ajouter plusieurs template suivant le rôle du user
+  return array(
+      // Template général pour afficher la médiathèque
+      'dashboard_theme' => array(
+          'variables' => array(),
+          'render element' => 'element',
+          'template' => 'dashboard',
+          'path' => drupal_get_path('module', 'dashboard') .'/theme',
+      ),
+  );
+}

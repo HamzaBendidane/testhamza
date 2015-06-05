@@ -1,0 +1,220 @@
+<?php
+
+/**
+ *  Fonctions utilisant les bases de données.
+ */
+require_once 'shared_db_functions.inc';
+
+/**
+ *  Vérifie les rôles d'un utilisateur
+ */
+function check_user_roles($user_extranet) {
+   global $user;
+
+   if(in_array($user_extranet, $user->roles)) {
+        unset($user->roles[$user_extranet]);
+      return true;
+    } else {
+     return false;
+  }
+}
+
+/**
+ * Infos de l'utilisateur via le Drupal USER
+ *
+ */
+function shared_users_verify_get_infos($id) {
+
+  db_set_active(@DB_EXTRANET);
+
+  $sql = db_select('drupal_user' , 'u')
+        ->fields('u', array('civilite', 'name', 'mail', 'fonction', 'telephone'))
+        ->condition('id_user_drupal', $id , '=')
+        ->execute();
+
+  $user_infos  = $sql->fetchAll();
+
+  db_set_active();
+
+  return $user_infos;
+}
+
+/**
+ * Rajoute les JS au module : Autocomplete
+ *
+ */
+function _shared_js(){
+  $path  = drupal_get_path('module', 'shared'); // Module PATH
+  drupal_add_js($path . '/js/shared.js'); // ADMIN JS
+}
+
+/**
+ * shared_get_referentiel_data
+ *
+ * Fonction qui permet de récupérer les données référentiel de l'extranet s'il n'existe pas et de les stocker dans une
+ * variable de session
+ *
+ * @param string $tables
+ */
+function shared_get_referentiel_data($tables, $isList = true) {
+  // Connection a l'extranet
+  db_set_active(@DB_EXTRANET);
+
+  if (is_array($tables)) {
+    foreach ($tables as $table) {
+      if (!isset($_SESSION['referentiel_extranet_datas'][$table])
+          || empty($_SESSION['referentiel_extranet_datas'][$table])) {
+        $results = db_select($table, 't')
+          ->fields('t', array('id', 'label'))
+          ->condition('is_delete', 0, '=')
+          ->execute()
+          ->fetchAllKeyed();
+
+        // Sauvegarde en session
+        if ($isList) {
+          array_unshift($results, 'Veuillez choisir dans la liste');
+        }
+        $_SESSION['referentiel_extranet_datas'][$table] = $results;
+      }
+    }
+  } else {
+    if (!isset($_SESSION['referentiel_extranet_datas'][$tables])
+        || empty($_SESSION['referentiel_extranet_datas'][$tables])) {
+      $results = db_select($tables, 't')
+        ->fields('t', array('id', 'label'))
+        ->condition('is_delete', 0, '=')
+        ->execute()
+        ->fetchAllKeyed();
+
+      // Sauvegarde en session
+      if ($isList) {
+        array_unshift($results, 'Veuillez choisir dans la liste');
+      }
+      $_SESSION['referentiel_extranet_datas'][$tables] = $results;
+    }
+  }
+
+  // Retour à la base de données par défaut.
+  db_set_active();
+}
+
+function shared_contrat_modal($stepName) {
+  $page = '
+    <div id="'.$stepName.'Modal" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+          <div class="modal-content">
+              <div class="modal-header">
+                   <button type="button" class="close modalQuit" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h4 class="modal-title">Quitter ?</h4>
+              </div>
+              <div class="modal-body">
+                  <p>Voulez vous sauvegardez vos données avant de quitter ?</p>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-default modalQuit" data-dismiss="modal">Quitter</button>
+                  <button id="'.$stepName.'Save" type="button" class="btn btn-primary">Sauvegarder</button>
+              </div>
+          </div><!-- /.modal-content -->
+      </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+  ';
+  return $page;
+}
+
+function shared_parse_mssql_datetime($dateToTransform) {
+  $tab = explode('.', trim($dateToTransform));
+  $date = \DateTime::createFromFormat('Y-m-d H:i:s', $tab[0]);
+  return $date;
+}
+
+
+function shared_parse_mssql_date($dateToTransform) {
+  $date = \DateTime::createFromFormat('Y-m-d', trim($dateToTransform));
+  return $date;
+}
+
+// Transforme une date au format attendu par SQL SERVER
+// Format SQL SERVER 2015-04-10 00:00:00.000
+function shared_sqlsrv_date($dateToTransform) {
+  $date = \DateTime::createFromFormat('Y-m-d H:i:s', $dateToTransform);
+  return $date;
+}
+
+function shared_send_to_mssql_date($dateFr = null, $type = 'date') {
+  if ($dateFr == null) {
+    $dateFr = date('d/m/Y');
+  }
+  $oDate = \DateTime::createFromFormat('d/m/Y', $dateFr);
+  if ($type == 'datetimeoffset') {
+    return $oDate->format('Y-m-d\T00:00:00.0000000\+00:00');
+  } else if ($type == 'datetime') {
+    return $oDate->format('Y-m-d\TH:i:s');
+  } else if ($type == 'date') {
+    return $oDate->format('Y-m-d');
+  }
+  return $dateFr;
+}
+
+function shared_validate_date($date, $format = 'd/m/Y') {
+  $d = DateTime::createFromFormat($format, $date );
+  return $d && $d->format($format ) == $date;
+}
+
+/**
+ *  Renvoie les Adefims de plusieurs Sirets
+ *  @param: $sirets - Les sirets en tableaux
+ *  @return: Les ADEFIM correspondant à chaque siret
+ *
+ */
+function shared_get_adefim_from_multiple_siret($sirets) {
+
+  $adefims = array(); // Tableau de résultats contenants les ADEFIMS
+
+  foreach ($sirets as $value) {
+      $adefims[$value] = get_adefim_from_siret($value);
+  }
+  return $adefims;
+}
+
+function shared_check_date_contrat_formation($dateStart,$dateEnd){
+
+
+    if (!$dateStart || !$dateEnd) return true;
+
+    $datetime1 =  DateTime::createFromFormat('d/m/Y', $dateStart) ;
+    $datetime2 =  DateTime::createFromFormat('d/m/Y', $dateEnd);
+
+    $datetime1->add(new DateInterval('P6M'));
+
+    if ($datetime1 > $datetime2) {
+        return false;
+    }
+
+    $datetime1 =  DateTime::createFromFormat('d/m/Y', $dateStart) ;
+    $datetime1->add(new DateInterval('P24M'));
+
+    if ($datetime1 < $datetime2) {
+        return false;
+    }
+    return true;
+}
+
+function shared_get_habilitation() {
+  db_set_active(@DB_EXTRANET);
+
+  $sql =  db_select('habilitation', 'hab')
+  ->fields('hab')
+  ->orderBy('libelle')
+  ->execute();
+
+  $data = $sql->fetchAll();
+
+  db_set_active();
+
+  $habilitations = array();
+  foreach ($data as $hab) {
+    $habilitations[$hab->cle] = $hab->libelle;
+  }
+
+  return $habilitations;
+}

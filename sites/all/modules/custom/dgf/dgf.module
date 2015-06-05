@@ -1,0 +1,233 @@
+<?php
+
+require_once 'breadcrumb.inc';
+require_once 'dgf_langs.inc';
+
+function _dgf_access_callback() {
+  return user_access('SAI_DGF_CP') || user_access('SAI_DGF_TA');
+}
+
+function dgf_menu() {
+  $items = array();
+  $items['dgf/demande'] = array(
+      'title' => t('Demande de gestion et financement'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_demande_form'),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/demande/dgf_demande_form.inc',
+      'type' => MENU_NORMAL_ITEM,
+  );
+
+  $items['dgf/demande/organisme-formation'] = array(
+      'title' => t('Demande de gestion et financement - organisme de formation'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_organisme_formation_form'),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/organisme_formation/organisme_formation_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['dgf/demande/contrat'] = array(
+      'title' => t('Demande de gestion et financement - contrat'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_contrat_form'),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/contrat/contrat_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+  $items['dgf/demande/formation'] = array(
+      'title' => t('Demande de gestion et financement - formation'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_formation_form'),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/formation/formation_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+ $items['dgf/demande/organisme-formation/autocomplete/siret'] = array(
+    //'title' => 'Siret Entreprises',
+    'page callback' => 'dgf_of_siret_autocomplete',
+    'access callback' => TRUE,
+    'file' => 'inc/organisme_formation/organisme_formation_auto_complete.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['dgf/demande/organisme-formation/autocomplete/activity-number'] = array(
+    'title' => 'Numéro de déclaration d’activité',
+    'page callback' => 'dgf_of_activity_number_autocomplete',
+    'access callback' => TRUE,
+    'file' => 'inc/organisme_formation/organisme_formation_auto_complete.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['dgf/demande/organisme-formation/autocomplete/corporate-name'] = array(
+    'title' => 'Raison sociale',
+    'page callback' => 'dgf_of_corporate_name_autocomplete',
+    'access callback' => TRUE,
+    'file' => 'inc/organisme_formation/organisme_formation_auto_complete.inc',
+    'type' => MENU_CALLBACK,
+  );
+
+  $items['dgf/demande/organisme-formation/ajax/get-contact-from-of'] = array(
+      'title' => 'Permet d\'obtenir les contacts d\'un organisme de formation',
+      'page callback' => 'organisme_formation_db_get_contact_from_organisme_formation',
+      'access callback' => TRUE,
+      'file' => 'inc/organisme_formation/organisme_formation_auto_complete.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['dgf/ajax/organisme-formation/check-contact-of-infos'] = array(
+      'title' => 'Vérifie si le contact sélectionné a un email et une fonction en BDD',
+      'page callback' => 'organisme_formation_db_check_contact_infos',
+      'access callback' => TRUE,
+      'file' => 'inc/organisme_formation/organisme_formation_db.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  //  Justificatifs
+  $items['dgf/demande/justificatifs'] = array(
+      'title' => t('Justificatifs'),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_justificatifs_form'),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/justificatifs/justificatifs_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  // Url pour supprimer un fichier
+  $items['dgf/demande/justificatifs/%/sup/%'] = array(
+      'page callback' => 'justificatifs_delete_files',
+      'page arguments' => array(3,5),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/justificatifs/justificatifs_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  $items['autocomplete/get-intitule-formation'] = array(
+      'title' => t('Liste des intitulés de formation correspondant au nom donné' ),
+      'page callback' => 'formation_db_get_referentiel_esclave_intitule_formation',
+      'access callback' => TRUE,
+      'file' => 'inc/formation/formation_db.inc',
+      'type' => MENU_CALLBACK
+  );
+
+  $items['dgf/demande/attestation'] = array(
+      'title' => t('Attestation' ),
+      'page callback' => 'drupal_get_form',
+      'page arguments' => array('dgf_attestation_form'),
+      'access callback' => '_dgf_access_callback',
+      'file' => 'inc/attestation/attestation_form.inc',
+      'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+// in_array sur 2 niveau
+function in_array_r($needle, $haystack, $strict = false) {
+  foreach ($haystack as $item) {
+    if (($strict ? $item === $needle : $item == $needle) || (is_array($item) && in_array_r($needle, $item, $strict))) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+
+// Gestion de l'affichage du breakcrumb pour les modules dgf et contrat_pro
+function dgf_form_alter (&$form_id, &$form) {
+  $etapes = array(
+      'Demande' => array('dgf_demande_form'),
+      'Stagiaire' => array('dgf_contrat_pro_stagiaire_form'),
+      'Contrat' => array('dgf_contrat_form'),
+      'Formation' => array('dgf_formation_form'),
+      'Organisme' => array('dgf_organisme_formation_form'),
+      'Tuteur' => array('dgf_contrat_pro_tuteur_form'),
+      'Visualisation' => array('dgf_contrat_pro_message_information_final_form', 'dgf_contrat_pro_cerfa_form'),
+      'Justificatif' => array('dgf_justificatifs_form'),
+//       'Paiement' => array('dgf_paiement_form')
+  );
+
+  if(isset($form_id['#form_id']) && (in_array_r($form_id['#form_id'], $etapes))) {
+    // Affichage en amont des formulaires
+    $form_id['#prefix'] = dgf_get_breadcrumb($etapes, $form_id['#form_id']);
+  }
+}
+
+function dgf_modal_quit_form(&$form, $validatorsQuit, $validatorsSave, $submitsSave, $ecran = null) {
+  $prefix = '<div id="modalquit" class="modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-sm">
+                <div class="modal-content">
+                  <div class="modal-header">
+                     <button type="button" class="close modalQuit" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4>Souhaitez-vous enregistrer ?</h4>
+                  </div>
+                    <div class="modal-footer">';
+
+  $suffix = '</div>
+                </div><!-- /.modal-content -->
+            </div><!-- /.modal-dialog -->
+          </div><!-- /.modal -->';
+
+
+  $form['modal_quit']['header'] = array(
+      '#type' => 'markup',
+      '#markup' => $prefix,
+  );
+
+  $form ['modal_quit']['modal_quit'] = array(
+      '#type' => 'submit',
+      '#value' => t('Non'),
+      '#attributes' => array(
+          'class' => array('btn btn-danger modalQuit'),
+      ),
+      '#validate' => $validatorsQuit,
+
+  );
+
+  $form ['modal_quit']['modal_save'] = array(
+      '#type' => 'submit',
+      '#value' => t('Oui'),
+      '#attributes' => array(
+          'class' => array('btn btn-primary modalSave'),
+      ),
+      '#validate' => $validatorsSave,
+      '#submit' => $submitsSave,
+  );
+
+  $form['modal_quit']['footer'] = array(
+      '#type' => 'markup',
+      '#markup' => $suffix,
+  );
+}
+
+function dgf_boutons_action_form(&$form, $validatorsBoutonNext, $submitsBoutonNext) {
+  $form['action'] = array(
+      '#type' => 'markup',
+      '#markup' => '<div id="boutonAction">',
+  );
+
+  $form['back'] = array(
+      '#type' => 'button',
+      '#value' => t('Précédent'),
+      '#limit_validation_errors' => array()
+  );
+
+  $form['quit'] = array(
+      '#type' => 'markup',
+      '#markup' => '<input type="button" id="edit-quit" value="Quitter" class="form-submit"></input>',
+  );
+
+  $form['next'] = array(
+      '#type' => 'submit',
+      '#value' => t('Suivant'),
+      '#validate' => $validatorsBoutonNext,
+      '#submit' => $submitsBoutonNext,
+  );
+
+  $form['action_fin'] = array(
+      '#type' => 'markup',
+      '#markup' => '</div>',
+  );
+}

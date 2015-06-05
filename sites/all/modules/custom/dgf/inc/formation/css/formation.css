@@ -1,0 +1,63 @@
+#total_duration_info {
+  float: left;
+  margin-right: 2px;
+}
+
+#duration_main_learning_info {
+  float: left;
+  margin-right: 2px;
+}
+
+#accompanying_actions_info {
+  float: left;
+  margin-right: 2px;
+}
+
+.modal-dialog {
+    top: 200px;
+}
+#modalinternaltraining .panel-footer {
+	text-align: center;
+	
+}
+
+#modalinternaltraining .panel-info {
+	margin-bottom: 0;
+}
+
+#edit-formations-recurrentes {
+	float: right;
+}
+
+/* #edit-formations-recurrentes li { */
+/*   background: white; */
+/*   color: black; */
+/* } */
+
+#edit-formations-recurrentes li:hover {
+/*   background: #196681; */
+  cursor: pointer;
+/*   color: white; */
+}
+
+/*--------------------------------------------
+ * durées de formation
+ *--------------------------------------------*/
+div.form-item-total-duration {
+	margin-bottom: 5px;
+}
+
+.paddingduree {
+  padding-left: 15px;
+}
+
+.paddingduree label {
+  width: 285px;
+}
+
+.paddingduree .form-item {
+  margin: 0px;
+  margin-bottom: 5px;
+}
+
+

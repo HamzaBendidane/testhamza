@@ -1,0 +1,25 @@
+.required label:after {
+    color: #e32;
+    content: ' *';
+    display:inline;
+}
+
+#edit-visucerfa {
+  display: block;
+  margin: auto;
+}
+
+.tooltip-inner {
+    max-width: 400px;
+    width: 400px; 
+}
+
+.form-item-certifier {
+  position: relative;
+}
+
+.form-item-certifier .field-suffix {
+  position: absolute;
+  top: 0;
+  left: 300px;
+}
